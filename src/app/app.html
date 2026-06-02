@@ -1,46 +1,61 @@
-<div style="max-width: 500px; margin: 40px auto; font-family: sans-serif; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+<div class="binder-container">
   
-  <h2>🎴 Mi TCG Vault</h2>
+  <h2>🎴 Mi TCG Vault Premium</h2>
+  <p style="color: #888; margin-bottom: 25px;">Estilo: Dark Leather Binder Edition</p>
 
-  <!-- ➕ Sección del Formulario para añadir cartas -->
-  <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-    <h4 style="margin-top: 0;">Añadir Nueva Carta</h4>
-    
-    <div style="display: flex; flex-direction: column; gap: 10px;">
-      <input type="text" [(ngModel)]="nuevoId" placeholder="ID de la carta (ej: OP01-013)" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-      <input type="text" [(ngModel)]="nuevoNombre" placeholder="Nombre (ej: Roronoa Zoro)" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-      <input type="text" [(ngModel)]="nuevaRareza" placeholder="Rareza (ej: SR)" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-      
-      <button (click)="agregarCarta()" style="background: #28a745; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-        ➕ Añadir al Vault
-      </button>
+  <div class="form-panel">
+    <h4>Añadir Nueva Carta al Álbum</h4>
+    <div class="input-group">
+      <input type="text" [(ngModel)]="nuevoId" placeholder="ID (ej: OP01-013)" />
+      <input type="text" [(ngModel)]="nuevoNombre" placeholder="Nombre de la carta" />
+      <input type="text" [(ngModel)]="nuevaRareza" placeholder="Rareza (ej: SR)" />
     </div>
+    <button (click)="agregarCarta()">➕ Insertar en el Archivador</button>
   </div>
 
-  <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+  <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;" />
 
-  <!-- 📜 Listado de cartas existentes -->
-  <h4>Tu Colección</h4>
-  <div style="display: flex; flex-direction: column; gap: 10px;">
-    @for (carta of cartas; track carta.id) {
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid #eee; border-radius: 4px;">
-        <div>
-          <strong>{{ carta.id }}</strong> - {{ carta.name }} 
-          <span style="font-size: 0.8em; color: #666; background: #eee; padding: 2px 6px; border-radius: 3px; margin-left: 5px;">
-            {{ carta.rarity }}
-          </span>
+  <h4>Tu Álbum de Colección</h4>
+
+  <div class="filter-panel">
+    <input type="text" [(ngModel)]="filtroTexto" placeholder="🔍 Buscar por nombre o ID del cromo..." />
+    <select [(ngModel)]="filtroRareza">
+      <option value="">Todas las rarezas</option>
+      <option value="leader">Leader</option>
+      <option value="sr">SR (Super Rare)</option>
+      <option value="r">Rare (R)</option>
+    </select>
+  </div>
+  
+  <div class="album-grid">
+    @for (carta of cartasFiltradas; track carta.id) {
+      <div class="card-slot" 
+           [class.rarity-sr]="carta.rarity.toLowerCase() === 'sr'"
+           [class.rarity-leader]="carta.rarity.toLowerCase() === 'leader'"
+           [class.status-empty]="carta.quantity === 0">
+        
+        <div class="card-header">
+          <span class="card-id">{{ carta.id }}</span>
+          <div class="card-name">{{ carta.name }}</div>
+          <span class="card-badge">{{ carta.rarity }}</span>
         </div>
         
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button (click)="restarCarta(carta)" style="padding: 2px 8px; cursor: pointer;">-</button>
-          <span style="font-weight: bold; min-width: 20px; text-align: center;">{{ carta.quantity }}</span>
-          <button (click)="sumarCarta(carta)" style="padding: 2px 8px; cursor: pointer;">+</button>
+        <div class="card-actions">
+          <div class="quantity-controls">
+            <button (click)="restarCarta(carta)">-</button>
+            <span class="qty-display">{{ carta.quantity }}</span>
+            <button (click)="sumarCarta(carta)">+</button>
+          </div>
           
-          <!-- 🗑️ Botón de eliminar definitivo -->
-          <button (click)="eliminarCarta(carta)" style="background: none; border: none; cursor: pointer; color: #dc3545; font-size: 1.1em; padding: 0 5px; margin-left: 5px;" title="Eliminar carta del Vault">
+          <button class="btn-delete" (click)="eliminarCarta(carta)" title="Arrancar del álbum">
             🗑️
           </button>
         </div>
+
+      </div>
+    } @empty {
+      <div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 40px 0;">
+        🫙 No hay cartas en el archivador que coincidan con la búsqueda.
       </div>
     }
   </div>

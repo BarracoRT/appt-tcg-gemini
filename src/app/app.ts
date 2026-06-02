@@ -23,9 +23,14 @@ export class App {
     { id: 'OP01-016', name: 'Nami', rarity: 'R', quantity: 3 }
   ];
 
+  // Variables para añadir cartas
   nuevoId = '';
   nuevoNombre = '';
   nuevaRareza = '';
+
+  // 🔍 Variables para el buscador y filtros
+  filtroTexto = '';
+  filtroRareza = '';
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -34,6 +39,23 @@ export class App {
         this.cartas = JSON.parse(datosGuardados);
       }
     }
+  }
+
+  // 🔥 Propiedad inteligente: Devuelve solo las cartas que coinciden con la búsqueda
+  get cartasFiltradas(): Carta[] {
+    return this.cartas.filter(carta => {
+      const texto = this.filtroTexto.toLowerCase().trim();
+      const rareza = this.filtroRareza.toLowerCase().trim();
+
+      // Comprueba si el texto coincide con el Nombre o con el ID
+      const coincideTexto = carta.name.toLowerCase().includes(texto) || 
+                            carta.id.toLowerCase().includes(texto);
+      
+      // Comprueba si coincide la rareza (si no hay filtro seleccionado, pasan todas)
+      const coincideRareza = rareza === '' || carta.rarity.toLowerCase() === rareza;
+
+      return coincideTexto && coincideRareza;
+    });
   }
 
   sumarCarta(carta: Carta) {
@@ -48,9 +70,7 @@ export class App {
     }
   }
 
-  // 🗑️ Nueva función para eliminar la carta por completo
   eliminarCarta(carta: Carta) {
-    // Filtramos la lista: nos quedamos con todas las cartas MENOS la que coincide con el ID seleccionado
     this.cartas = this.cartas.filter(c => c.id !== carta.id);
     this.guardarEnDisko();
   }
